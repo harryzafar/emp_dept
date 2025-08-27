@@ -33,7 +33,7 @@ It demonstrates clean architecture, authentication, relationships, validations, 
 ## 📦 Installation & Setup
 
 ### 1. Clone the Repository
-```bash
+
 git clone https://github.com/harryzafar/emp_dept.git
 cd employee-management-api
 ```
@@ -60,12 +60,11 @@ DB_PASSWORD=
 ```
 
 ### 4. Generate App Key
-```bash
 php artisan key:generate
 ```
 
 ### 5. Run Migrations & Seeders
-```bash
+
 php artisan migrate --seed
 ```
 
@@ -76,7 +75,7 @@ Password: password
 ```
 
 ### 6. Run the Development Server
-```bash
+
 php artisan serve
 ```
 
@@ -100,16 +99,98 @@ This project uses **token-based authentication** with Laravel Sanctum.
   "password_confirmation": "password"
 }
 ```
+Success Response
+Code: 201 Created
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "access_token": "1|ABCXYZ123TOKEN"
+}
+
+Error Response:
+Code: 422 Unprocessable Entity
+{
+  "message": "The email has already been taken.",
+  "errors": {
+    "email": [
+      "The email has already been taken."
+    ]
+  }
+}
+
+
+
 
 ### Login
 `POST /api/login`  
 **Body:**
-```json
 {
   "email": "john@example.com",
   "password": "password"
 }
-```
+
+Success Response:
+Code: 200 OK
+{
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "access_token": "1|ABCXYZ123TOKEN"
+}
+
+Error Response:
+Code: 401 Unauthorized
+{
+  "message": "Invalid credentials"
+}
+
+### Profile
+`GET /api/user`  
+Headers:
+Authorization: Bearer <token>
+
+Success Response:
+Code: 200 OK
+
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "created_at": "2025-08-20T12:34:56.000000Z",
+  "updated_at": "2025-08-20T12:34:56.000000Z"
+}
+
+Error Response:
+Code: 401 Unauthorized
+{
+  "message": "Unauthenticated."
+}
+
+### logout
+Endpoint: POST /api/logout
+Headers:
+Authorization: Bearer <token>
+
+Success Response:
+Code: 200 OK
+
+{
+  "message": "Logged out successfully"
+}
+
+Error Response:
+Code: 401 Unauthorized
+
+{
+  "message": "Unauthenticated."
+}
 
 Response contains an `access_token` that must be sent in the `Authorization` header:  
 ```
@@ -135,6 +216,216 @@ Authorization: Bearer <token>
 - `DELETE /api/employees/{id}` → Delete employee  
 
 ---
+### 👥 Employees
+1. List Employees
+
+GET /api/employees
+
+Success Response
+[
+  {
+    "id": 1,
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "zafarr.doe@example.com",
+    "designation": "Software Engineer",
+    "department": "IT"
+  }
+]
+
+2. Create Employee
+
+POST /api/employees
+
+Request Body
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "zafarr.doe@example.com",
+  "date_of_birth": "1990-05-15",
+  "designation": "Software Engineer",
+  "department_id": 3,
+  "phone_numbers": [
+    {
+      "phone": "9876543210",
+      "label": "mobile",
+      "is_primary": true
+    },
+    {
+      "phone": "0123456789",
+      "label": "home",
+      "is_primary": false
+    }
+  ],
+  "addresses": [
+    {
+      "line1": "123 Main Street",
+      "line2": "Apt 4B",
+      "city": "New Delhi",
+      "state": "Delhi",
+      "country": "India",
+      "postal_code": "110001",
+      "label": "home",
+      "is_primary": true
+    },
+    {
+      "line1": "456 Corporate Tower",
+      "line2": "Floor 7",
+      "city": "Gurgaon",
+      "state": "Haryana",
+      "country": "India",
+      "postal_code": "122001",
+      "label": "office",
+      "is_primary": false
+    }
+  ]
+}
+
+Success Response
+{
+  "message": "Employee created successfully",
+  "employee": {
+    "id": 1,
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "zafarr.doe@example.com",
+    "designation": "Software Engineer"
+  }
+}
+
+Validation Rules
+
+first_name, last_name → required, string
+
+email → required, unique, email
+
+date_of_birth → required, date
+
+designation → required, string
+
+department_id → required, exists:departments
+
+phone_numbers → array, each phone required, max:15 digits
+
+addresses → array, each address requires line1, city, state, country, postal_code
+
+Error Response
+{
+  "errors": {
+    "email": ["The email has already been taken."]
+  }
+}
+
+3. Get Employee
+
+GET /api/employees/{id}
+
+Success Response
+{
+  "id": 1,
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "zafarr.doe@example.com",
+  "designation": "Software Engineer",
+  "department": "IT",
+  "phone_numbers": [...],
+  "addresses": [...]
+}
+
+Error Response
+{
+  "message": "Employee not found"
+}
+
+4. Update Employee
+
+PUT /api/employees/{id}
+
+(Same body as create)
+
+Success Response
+{
+  "message": "Employee updated successfully"
+}
+
+5. Delete Employee
+
+DELETE /api/employees/{id}
+
+Success Response
+{
+  "message": "Employee deleted successfully"
+}
+
+### 🏢 Departments
+1. List Departments
+
+GET /api/departments
+
+[
+  {
+    "id": 1,
+    "name": "IT"
+  }
+]
+
+2. Create Department
+
+POST /api/departments
+
+Request Body
+{
+  "name": "Finance"
+}
+
+Success Response
+{
+  "message": "Department created successfully",
+  "department": {
+    "id": 2,
+    "name": "Finance"
+  }
+}
+
+Error Response
+{
+  "errors": {
+    "name": ["The name field is required."]
+  }
+}
+
+3. Get Department
+
+GET /api/departments/{id}
+
+Success Response
+{
+  "id": 1,
+  "name": "IT"
+}
+
+4. Update Department
+
+PUT /api/departments/{id}
+
+Request Body
+{
+  "name": "Human Resources"
+}
+
+Success Response
+{
+  "message": "Department updated successfully"
+}
+
+5. Delete Department
+
+DELETE /api/departments/{id}
+
+Success Response
+{
+  "message": "Department deleted successfully"
+}
 
 ## 🧪 Running Tests
 
