@@ -17,18 +17,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-       // Create 5 departments, each with 10 employees, each employee with phone numbers & addresses
+
+        // Seed default user
+        $this->call(UserSeeder::class);
+        // Create 5 departments, each with 10 employees, each employee with phone numbers & addresses
         Department::factory(5)->create()->each(function ($department) {
             $employees = Employee::factory(10)->create(['department_id' => $department->id]);
 
             $employees->each(function ($employee) {
                 // 1-3 phone numbers per employee
-                EmployeePhoneNumber::factory(rand(1,3))->create([
+                EmployeePhoneNumber::factory(rand(1, 3))->create([
                     'employee_id' => $employee->id
                 ]);
 
                 // 1-2 addresses per employee
-                EmployeeAddress::factory(rand(1,2))->create([
+                EmployeeAddress::factory(rand(1, 2))->create([
                     'employee_id' => $employee->id
                 ]);
             });
