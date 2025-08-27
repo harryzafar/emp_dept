@@ -35,8 +35,9 @@ It demonstrates clean architecture, authentication, relationships, validations, 
 ### 1. Clone the Repository
 
 git clone https://github.com/harryzafar/emp_dept.git
-cd employee-management-api
-```
+
+cd emp_dept
+
 
 ### 2. Install Dependencies
 
@@ -54,7 +55,7 @@ Update the following keys in `.env`:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=employee_management
+DB_DATABASE=emp_dept
 DB_USERNAME=root
 DB_PASSWORD=
 ```
